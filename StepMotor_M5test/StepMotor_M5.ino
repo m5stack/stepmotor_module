@@ -1,14 +1,14 @@
-//Example for M5Stack StepMotor Module (I2C verison)
-//2018/6/27 JimmyLai
+// Example for M5Stack StepMotor Module (I2C verison)
+// 2018/6/27 JimmyLai
 #include <M5Stack.h>
 #include <Wire.h>
-void setup()
-{
+
+void setup() {
   // put your setup code here, to run once:
   M5.begin();
   Wire.begin();
   Serial.begin(115200);
-  m5.Lcd.setTextColor( WHITE, BLACK);
+  m5.Lcd.setTextColor(WHITE, BLACK);
   m5.Lcd.setTextSize(2);
   m5.lcd.setBrightness(100);
   M5.Lcd.setCursor(4, 10);
@@ -18,43 +18,40 @@ void setup()
   M5.Lcd.setCursor(4, 50);
   M5.Lcd.println("Press B: 0x71");
 }
-void SendI2C(byte addr, byte b)
-{
+
+void SendByte(byte addr, byte b) {
   Wire.beginTransmission(addr);
   Wire.write(b);
   Wire.endTransmission();
 }
-void SendCommand(byte addr, char *c)
-{
-  while ((*c) != 0)
-  {
-    SendI2C(addr, *c);
+
+void SendCommand(byte addr, char *c) {
+  Wire.beginTransmission(addr);
+  while ((*c) != 0) {
+    Wire.write(*c);
     c++;
-    delay(1);
   }
-  SendI2C(addr, 0x0d);
-  delay(1);
-  SendI2C(addr, 0x0a);
-  delay(1);
+  Wire.write(0x0d);
+  Wire.write(0x0a);
+  Wire.endTransmission();
 }
-void loop()
-{
-  if (digitalRead(39) == LOW)//A button
+
+void loop() {
+  if (digitalRead(39) == LOW)  // A button
   {
-    while (digitalRead(39) == LOW)delay(1);
+    while (digitalRead(39) == LOW) delay(1);
     SendCommand(0x70, "G1 X20Y20Z20 F500");
     SendCommand(0x70, "G1 X0Y0Z0 F400");
   }
-  if (digitalRead(38) == LOW)//B button
+  if (digitalRead(38) == LOW)  // B button
   {
-    while (digitalRead(38) == LOW)delay(1);
+    while (digitalRead(38) == LOW) delay(1);
     SendCommand(0x71, "G1 X20Y20Z20 F500");
     SendCommand(0x71, "G1 X0Y0Z0 F400");
   }
-  if (digitalRead(37) == LOW)//C button
+  if (digitalRead(37) == LOW)  // C button
   {
-    while (1)
-    {
+    while (1) {
       SendCommand(0x70, "G1 X0Y0Z0 F500");
       SendCommand(0x71, "G1 X0Y0Z0 F500");
       delay(1000);
@@ -67,25 +64,20 @@ void loop()
       delay(1000);
     }
   }
-  //Get Data from Module.
+  // Get Data from Module.
   Wire.requestFrom(0x70, 1);
-  if (Wire.available() > 0)
-  {
+  if (Wire.available() > 0) {
     int u = Wire.read();
-    if (u != 0)
-      Serial.write(u);
+    if (u != 0) Serial.write(u);
   }
   Wire.requestFrom(0x71, 1);
-  if (Wire.available() > 0)
-  {
+  if (Wire.available() > 0) {
     int u = Wire.read();
-    if (u != 0)
-      Serial.write(u);
+    if (u != 0) Serial.write(u);
   }
   delay(1);
-  //Send Data to Module.
-  while (Serial.available() > 0)
-  {
+  // Send Data to Module.
+  while (Serial.available() > 0) {
     int inByte = Serial.read();
     SendI2C(0x70, inByte);
     SendI2C(0x71, inByte);
