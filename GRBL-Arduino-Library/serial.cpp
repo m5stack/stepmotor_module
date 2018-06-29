@@ -147,29 +147,31 @@ void requestEvent()  //I2C request data from core. modify by M5STack.
 
 void receiveEvent(int howMany) //I2C : Send data from core. modify by M5STack.
 {
-
-	uint8_t data = Wire.read();
-//	serial_write(data);
-  uint8_t next_head;
-  // Pick off runtime command characters directly from the serial stream. These characters are
-  // not passed into the buffer, but these set system state flag bits for runtime execution.
-  switch (data)
+  while(Wire.available())
   {
-    case CMD_STATUS:if(sys.state==STATE_IDLE) serial_write('I');else serial_write('B');break; 
-    case CMD_STATUS_REPORT: sys.execute |= EXEC_STATUS_REPORT; break; // Set as true
-    case CMD_CYCLE_START:   sys.execute |= EXEC_CYCLE_START; break; // Set as true
-    case CMD_FEED_HOLD:     sys.execute |= EXEC_FEED_HOLD; break; // Set as true
-    case CMD_RESET:         mc_reset(); break; // Call motion control reset routine.
-    default: // Write character to buffer    
-      next_head = rx_buffer_head + 1;
-      if (next_head == RX_BUFFER_SIZE) { next_head = 0; }
-    
-      // Write data to buffer unless it is full.
-      if (next_head != rx_buffer_tail) 
-	  {
-        rx_buffer[rx_buffer_head] = data;
-        rx_buffer_head = next_head;    
-	  }
+    uint8_t data = Wire.read();
+  //	serial_write(data);
+    uint8_t next_head;
+    // Pick off runtime command characters directly from the serial stream. These characters are
+    // not passed into the buffer, but these set system state flag bits for runtime execution.
+    switch (data)
+    {
+      case CMD_STATUS:if(sys.state==STATE_IDLE) serial_write('I');else serial_write('B');break; 
+      case CMD_STATUS_REPORT: sys.execute |= EXEC_STATUS_REPORT; break; // Set as true
+      case CMD_CYCLE_START:   sys.execute |= EXEC_CYCLE_START; break; // Set as true
+      case CMD_FEED_HOLD:     sys.execute |= EXEC_FEED_HOLD; break; // Set as true
+      case CMD_RESET:         mc_reset(); break; // Call motion control reset routine.
+      default: // Write character to buffer    
+        next_head = rx_buffer_head + 1;
+        if (next_head == RX_BUFFER_SIZE) { next_head = 0; }
+      
+        // Write data to buffer unless it is full.
+        if (next_head != rx_buffer_tail) 
+      {
+          rx_buffer[rx_buffer_head] = data;
+          rx_buffer_head = next_head;    
+      }
+    }
   }
 }
 
