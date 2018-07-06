@@ -79,7 +79,7 @@ void loop() {
   // Send Data to Module.
   while (Serial.available() > 0) {
     int inByte = Serial.read();
-    SendI2C(0x70, inByte);
-    SendI2C(0x71, inByte);
+    SendByte(0x70, inByte);
+    SendByte(0x71, inByte);
   }
 }
