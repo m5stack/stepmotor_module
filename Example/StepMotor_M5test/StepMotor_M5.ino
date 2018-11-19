@@ -4,7 +4,7 @@
 #include <Wire.h>
 
 /*
- * The I2C address of StepMotor Module is 0x70 by default. But if you change this I2C address through burning this firmware, you need to use I2C address `0x71` for correct communication.
+ * The I2C address of StepMotor Module is 0x70 by default. But if you change this I2C address through burning this firmware(https://github.com/m5stack/stepmotor_module/blob/master/Firmware%20for%20stepmotor%20module/GRBL-Arduino-Library/examples/GRBL_I2C/GRBL_I2C_0x71.hex), you need to use I2C address `0x71` for correct communication.
  */
 
 #define STEPMOTOR_I2C_ADDR 0x70
